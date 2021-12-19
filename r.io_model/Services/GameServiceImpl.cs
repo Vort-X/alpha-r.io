@@ -1,31 +1,38 @@
 ﻿using r.io_model.GameEntities;
-using System;
+using r.io_model.Services.Abstract;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace r.io_model.Services
 {
-    public class GameServiceImpl : AbstractService
+    public class GameServiceImpl : GameService
     {
-        public GameServiceImpl(List<CircleGameObject> killableObjects, GameArea gameArea) : base(killableObjects, gameArea)
+        public Game game { get; internal set; }
+
+        private readonly PlayerService playerService;
+        private readonly GameFactory factory;
+
+        public GameServiceImpl(Game game, GameFactory factory, PlayerService playerService)
         {
+            this.game = game;
+            this.factory = factory;
+            this.playerService = playerService;
         }
 
-        public void Kill(CircleGameObject gameObject)
+        public List<PlayerCircle> getTopPlayers(int topAmount)
         {
-            killableObjects.Remove(gameObject);
+            return game.gameArea.parts.SelectMany(i => i.killableObjects)
+                             .Where(i => i is PlayerCircle)
+                             .Cast<PlayerCircle>()
+                             .OrderByDescending(i => i.radius)
+                             .Take(topAmount)
+                             .ToList();
         }
 
-        public (GameArea, List<CircleGameObject>) UpdatePlayerVision(int x, int y)
+        public void RegisterPlayer(string name)
         {
-            return (new GameArea(x, y, y), new List<CircleGameObject>());
-        }
-
-        public void TimeCheck()
-        {
-
+            PlayerCircle player = factory.createPlayer(game, name);
+            playerService.getAreaPart(player.x, player.y).killableObjects.Add(player);
         }
     }
 }
