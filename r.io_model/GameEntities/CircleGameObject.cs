@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace r.io_model.GameEntities
+﻿namespace r.io_model.GameEntities
 {
     public abstract class CircleGameObject
     {
-        internal int objectId { get; set; }
-        internal int x { get; set; }
-        internal int y { get; set; }
-        internal double radius { get; set; }
+        public  int objectId { get; internal set; }
+        public int x { get; internal set; }
+        public int y { get; internal set; }
+        public double radius { get; internal set; }
 
-        protected CircleGameObject(int x, int y, double radius)
+        protected CircleGameObject(int objectId, int x, int y, double radius)
         {
+            this.objectId = objectId;
             this.x = x;
             this.y = y;
             this.radius = radius;
