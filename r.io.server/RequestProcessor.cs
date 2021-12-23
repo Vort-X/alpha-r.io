@@ -1,6 +1,7 @@
 ﻿using r.io.model.Services.Abstract;
 using r.io.server.Constants;
 using r.io.shared;
+using r.io.shared.PackageProcessing;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,6 +27,9 @@ namespace r.io.server
             queue = new RequestQueue();
             serializer = new Serializer<UdpPackage>();
         }
+
+        public List<RequestHandler> RequestHandlers { get; set; }
+        public List<ResponseCreator> ResponseCreators { get; set; }
 
         //TODO: remove this garbage
         public GameLoopManager GameLoopManager
@@ -53,15 +57,13 @@ namespace r.io.server
                 timeoutedUsers.ForEach(x => connectedUsers.Remove(x));
                 Task[] tc = connectedUsers.Select(u => Task.Run(() =>
                 {
-                    //TODO: refactor this as UdpPackageCreator class or smth
+                    //TODO: refactor this as response creators
                     //Types of UdpPackage responses:
                     //-[n]earby GameAreas
                     //-round [e]nd and player top
                     //-[t]imeout
                     //TODO: find other types
-                    UdpPackage pack = new();
-                    pack.Type = 'n';
-                    //pack["areas"] = PlayerService.getGameAreasAround(u.Player.x, u.Player.y);
+                    UdpPackage pack = ResponseCreators.Find(rc => rc.Type == 'n')?.Create(u.Player) ?? new();
 
                     byte[] data = serializer.Serialize(pack);
                     Send?.Invoke(u.EndPoint, data);
@@ -102,26 +104,23 @@ namespace r.io.server
                 //considering queue.Count > 0
                 lock (queue)
                 {
-                    //TODO: refactor this
                     var request = queue.Dequeue();
                     var pack = serializer.Deserialize(request.Buffer);
-
-                    if (pack.Type == 'c')
-                    {
-                        UserConnection conn = new()
-                        { 
-                            EndPoint = request.RemoteEndPoint,
-                        };
-                        connectedUsers.Add(conn);
-                    }
-
-                    connectedUsers.Find(u => u.EndPoint.Equals(request.RemoteEndPoint))?.UpdateLastPing();
                     //Types of UdpPackage requests:
                     //-[c]onnect to game
                     //-[m]ove by vector (or angle)
                     //-[d]isconnect from game
                     //-[e]mpty pack (to avoid timeout)
                     //TODO: find other types
+                    RequestHandlers.Find(rc => rc.Type == pack.Type)?.Handle(pack);
+                    //TODO: fix ifs
+                    if (pack.Type == 'c') connectedUsers.Add(new() 
+                    { 
+                        EndPoint = request.RemoteEndPoint, 
+                        Player = gameLoopManager.gameService.RegisterPlayer("mihailo") 
+                    });
+                    if (pack.Type == 'd') connectedUsers.RemoveAll(c => c.EndPoint == request.RemoteEndPoint);
+                    connectedUsers.Find(u => u.EndPoint.Equals(request.RemoteEndPoint))?.UpdateLastPing();
                 }
             }
         }

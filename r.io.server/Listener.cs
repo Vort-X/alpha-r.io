@@ -22,7 +22,7 @@ namespace r.io.server
             {
                 client = new UdpClient(Server.Port);
                 requestProcessor.Send += OnSend;
-                //gameLoopManager.Start();
+                gameLoopManager.Start();
                 requestProcessor.Start();
                 while (true)
                 {

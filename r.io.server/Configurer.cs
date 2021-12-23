@@ -1,5 +1,6 @@
 ﻿using r.io.model.Services;
 using r.io.model.Services.Abstract;
+using r.io.server.PackageProcessing;
 using r.io.shared.Services;
 using System;
 using System.Collections.Generic;
@@ -14,8 +15,11 @@ namespace r.io.server
         public static Listener Create()
         {
             Listener l = new();
-            RequestProcessor processor = new();
             GameServiceCollection gameServices = ConfigureGameServices();
+            RequestProcessor processor = new();
+            processor.RequestHandlers = PackageProcessorActivator.GetRequestHandlers(gameServices);
+            processor.ResponseCreators = PackageProcessorActivator.GetResponseCreators(gameServices);
+
             l.gameLoopManager = gameServices.Get<GameLoopManager>();
             l.requestProcessor = processor;
             processor.GameLoopManager = gameServices.Get<GameLoopManager>();
