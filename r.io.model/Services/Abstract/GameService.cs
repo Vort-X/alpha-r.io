@@ -6,7 +6,7 @@ namespace r.io.model.Services.Abstract
     public interface GameService
     {
         List<PlayerCircle> getTopPlayers(int topAmount);
-        void RegisterPlayer(string name);
+        PlayerCircle RegisterPlayer(string name);
 
     }
 }

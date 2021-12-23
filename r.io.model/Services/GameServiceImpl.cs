@@ -29,10 +29,11 @@ namespace r.io.model.Services
                              .ToList();
         }
 
-        public void RegisterPlayer(string name)
+        public PlayerCircle RegisterPlayer(string name)
         {
             PlayerCircle player = factory.createPlayer(game, name);
             playerService.getAreaPart(player.x, player.y).killableObjects.Add(player);
+            return player;
         }
     }
 }
