@@ -11,6 +11,6 @@ namespace r.io.server.Constants
     {
         public static readonly int Port = 4096;
         public static readonly int TicksPerSecond = 10;
-        public static readonly int SessionTimeout = 60 * 1000;
+        public static readonly int SessionTimeout = 5 * 1000;
     }
 }

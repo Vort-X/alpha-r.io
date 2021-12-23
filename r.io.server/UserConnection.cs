@@ -7,11 +7,11 @@ namespace r.io.server
 {
     class UserConnection
     {
-        private DateTime lastPing;
+        private DateTime lastPing = DateTime.Now;
 
         public IPEndPoint EndPoint { get; internal set; }
         public PlayerCircle Player { get; internal set; }
-        public bool Timeout => (DateTime.Now - lastPing).TotalMilliseconds > Server.SessionTimeout;
+        public bool Timeouted => (DateTime.Now - lastPing).TotalMilliseconds > Server.SessionTimeout;
 
         public void UpdateLastPing()
         {

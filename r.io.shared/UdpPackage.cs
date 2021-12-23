@@ -24,6 +24,6 @@ namespace r.io.shared
         }
 
         [System.Diagnostics.CodeAnalysis.NotNull]
-        public string Type { get; set; }
+        public char Type { get; set; }
     }
 }

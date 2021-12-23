@@ -1,10 +1,8 @@
 ﻿using r.io.model.Services.Abstract;
 using r.io.server.Constants;
-using r.io.shared;
 using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading.Tasks;
 
 namespace r.io.server
 {
@@ -24,14 +22,21 @@ namespace r.io.server
             {
                 client = new UdpClient(Server.Port);
                 requestProcessor.Send += OnSend;
-                gameLoopManager.Start();
+                //gameLoopManager.Start();
                 requestProcessor.Start();
                 while (true)
                 {
-                    var request = client.ReceiveAsync();
-                    var result = request.Result; //awaiting result, current thread blocks until package received
-                    Console.WriteLine($"Receiving data at {DateTime.Now}");
-                    requestProcessor.AddToQueue(result);
+                    //TODO: find a way to handle disconnection w/o try-catch
+                    try
+                    {
+                        var request = client.ReceiveAsync();
+                        var result = request.GetAwaiter().GetResult(); //awaiting result, current thread blocks until package received
+                        Console.WriteLine($"Receiving data at {DateTime.Now}");
+                        requestProcessor.AddToQueue(result);
+                    }
+                    catch (SocketException)
+                    {
+                    }
                 }
             }
             finally
