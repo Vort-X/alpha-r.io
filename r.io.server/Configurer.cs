@@ -1,4 +1,6 @@
 ﻿using r.io.model.Services;
+using r.io.model.Services.Abstract;
+using r.io.shared.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,13 +15,23 @@ namespace r.io.server
         {
             Listener l = new();
             RequestProcessor processor = new();
+            GameServiceCollection gameServices = ConfigureGameServices();
+            l.gameLoopManager = gameServices.Get<GameLoopManager>();
+            l.requestProcessor = processor;
+            processor.GameLoopManager = gameServices.Get<GameLoopManager>();
+            return l;
+        }
+
+        private static GameServiceCollection ConfigureGameServices()
+        {
+            GameServiceCollection gameServices = new();
             GameFactoryImpl factory = new();
             GameLoopManagerImpl loop = new(factory);
-            l.gameLoopManager = loop;
-            l.requestProcessor = processor;
-            processor.GameLoopManager = loop;
-            processor.GameFactory = factory;
-            return l;
+            gameServices.Add(loop);
+            gameServices.Add(factory);
+            gameServices.Add(loop.gameService);
+            gameServices.Add(loop.playerService);
+            return gameServices;
         }
     }
 }

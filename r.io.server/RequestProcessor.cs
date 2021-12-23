@@ -27,7 +27,7 @@ namespace r.io.server
             serializer = new Serializer<UdpPackage>();
         }
 
-        public GameFactory GameFactory { get; internal set; }
+        //TODO: remove this garbage
         public GameLoopManager GameLoopManager
         {
             get => gameLoopManager;
@@ -37,8 +37,6 @@ namespace r.io.server
                 gameLoopManager = value;
             }
         }
-        public GameService GameService => GameLoopManager.gameService;
-        public PlayerService PlayerService => GameLoopManager.playerService;
 
         public event Action<IPEndPoint, byte[]> Send;
 
@@ -53,7 +51,7 @@ namespace r.io.server
             {
                 var timeoutedUsers = connectedUsers.Where(x => x.Timeouted).ToList();
                 timeoutedUsers.ForEach(x => connectedUsers.Remove(x));
-                Task[] ta = connectedUsers.Select(u => Task.Run(() =>
+                Task[] tc = connectedUsers.Select(u => Task.Run(() =>
                 {
                     //TODO: refactor this as UdpPackageCreator class or smth
                     //Types of UdpPackage responses:
@@ -77,7 +75,7 @@ namespace r.io.server
                     Send?.Invoke(u.EndPoint, data);
                 })).ToArray();
                 Task.WaitAll(tt);
-                Task.WaitAll(ta);
+                Task.WaitAll(tc);
             }
         }
 
