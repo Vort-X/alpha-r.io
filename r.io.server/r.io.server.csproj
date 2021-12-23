@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\r.io.model\r.io.model.csproj" />
+    <ProjectReference Include="..\r.io.shared\r.io.shared.csproj" />
+  </ItemGroup>
+
+</Project>
