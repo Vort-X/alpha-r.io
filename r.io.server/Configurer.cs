@@ -33,8 +33,8 @@ namespace r.io.server
             GameLoopManagerImpl loop = new(factory);
             gameServices.Add(loop);
             gameServices.Add(factory);
-            gameServices.Add(loop.gameService);
-            gameServices.Add(loop.playerService);
+            //gameServices.Add(loop.gameService);
+            //gameServices.Add(loop.playerService);
             return gameServices;
         }
     }

@@ -15,7 +15,7 @@ namespace r.io.server.PackageProcessing
         protected override void Configure(UdpPackage pack, params object[] @params)
         {
             var player = @params[0] as PlayerCircle;
-            var areas = gameServices.Get<PlayerService>().getGameAreasAround(player.x, player.y);
+            var areas = gameServices.Get<GameLoopManager>().playerService.getGameAreasAround(player.x, player.y);
             pack["areas"] = new NearbyAreasNode()
             {
                 AreaParts = areas.Select(a => a.ToNode()).ToList(),
