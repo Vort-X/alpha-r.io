@@ -9,10 +9,11 @@ namespace r.io.model.GameEntities
         public int side { get; internal set; }
         public List<AreaPart> parts { get; internal set; }
 
-        public GameArea(int maxX, int maxY)
+        public GameArea(int maxX, int maxY, int side)
         {
             this.maxX = maxX;
             this.maxY = maxY;
+            this.side = side;
             this.parts = new List<AreaPart>();
         }
     }

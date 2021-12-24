@@ -54,7 +54,7 @@ namespace r.io.model.Services
         public AreaPart getAreaPart(double x, double y)
         {
             int sideRange = game.gameArea.side;
-            return game.gameArea.parts.Find(i => (x > i.xLeft && x < i.xLeft + sideRange) && (y < i.yTop && y > i.yTop - sideRange));
+            return game.gameArea.parts.Find(i => (x >= i.xLeft && x < i.xLeft + sideRange) && (y >= i.yTop && y < i.yTop + sideRange));
         }
 
         private bool isEatable(CircleGameObject player, CircleGameObject food)
