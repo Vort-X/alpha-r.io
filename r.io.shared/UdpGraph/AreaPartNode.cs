@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace r.io.shared.UdpGraph
 {
+    [Serializable]
     public class AreaPartNode : Node
     {
         public int XLeft { get; set; }
