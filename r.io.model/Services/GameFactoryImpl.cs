@@ -11,7 +11,7 @@ namespace r.io.model.Services
         public Game createGame()
         {
             double roundDurationInSeconds = 100;
-            int gameAreaSide = 10000;
+            int gameAreaSide = 1000;
             int areaPartSide = 100;
             double foodRadius = 5;
             int foodAmount = 40;
@@ -22,9 +22,9 @@ namespace r.io.model.Services
 
             int areaPartAmount = gameAreaSide / areaPartSide;
 
-            for (int y = 0; y < Math.Sqrt(areaPartAmount); y++)
+            for (int y = 0; y < areaPartAmount; y++)
             {
-                for (int x = 0; x < Math.Sqrt(areaPartAmount); x++)
+                for (int x = 0; x < areaPartAmount; x++)
                 {
                     areaParts.Add(new AreaPart(0 + x * areaPartSide, 0 + y * areaPartSide));
                 }
@@ -59,7 +59,7 @@ namespace r.io.model.Services
 
         private AreaPart getAreaPart(double x, double y, List<AreaPart> areaParts, int sideRange)
         {
-            return areaParts.Find(i => (x > i.xLeft && x < i.xLeft + sideRange) && (y < i.yTop && y > i.yTop - sideRange));
+            return areaParts.Find(i => (x >= i.xLeft && x < i.xLeft + sideRange) && (y >= i.yTop && y < i.yTop + sideRange));
         }
     }
 }
