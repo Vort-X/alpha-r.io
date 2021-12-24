@@ -36,7 +36,8 @@ namespace r.io.model.Services
                 getAreaPart(food.x, food.y, areaParts, areaPartSide).killableObjects.Add(food);
             }
 
-            GameArea gameArea = new GameArea(gameAreaSide, gameAreaSide);
+            GameArea gameArea = new(gameAreaSide, gameAreaSide);
+            gameArea.parts = areaParts;
 
             return new Game(gameArea, roundTimer);
         }
