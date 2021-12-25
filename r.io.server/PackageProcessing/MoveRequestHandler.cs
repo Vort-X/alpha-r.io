@@ -35,6 +35,7 @@ namespace r.io.server.PackageProcessing
             var conn = connectionService.Get(result.RemoteEndPoint);
             var move = pack.Node as MoveNode;
             gameLoopManager.playerService.Move(conn.Player, move.X, move.Y);
+            gameLoopManager.playerService.TryEat(conn.Player);
             conn.UpdateLastPing();
         }
     }
