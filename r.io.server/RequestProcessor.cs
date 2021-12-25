@@ -1,6 +1,7 @@
 ﻿using r.io.model.GameEntities;
 using r.io.model.Services.Abstract;
 using r.io.server.Constants;
+using r.io.server.PackageProcessing;
 using r.io.server.Services;
 using r.io.shared;
 using r.io.shared.PackageProcessing;
@@ -20,16 +21,28 @@ namespace r.io.server
     {
         private readonly RequestQueue queue;
         private readonly List<IPEndPoint> tickIPs;
+
         private Timer broadcastTimer;
+        private GameServiceCollection gameServices;
+        private List<RequestHandler> requestHandlers;
+        private List<ResponseCreator> responseCreators;
 
         public RequestProcessor()
         {
             queue = new();
+            tickIPs = new();
         }
 
-        public GameServiceCollection GameServices { get; set; }
-        public List<RequestHandler> RequestHandlers { get; set; }
-        public List<ResponseCreator> ResponseCreators { get; set; }
+        public GameServiceCollection GameServices
+        {
+            get => gameServices;
+            set
+            {
+                gameServices = value;
+                requestHandlers = PackageProcessorActivator.GetRequestHandlers(gameServices);
+                responseCreators = PackageProcessorActivator.GetResponseCreators(gameServices);
+            }
+        }
 
         public event Action<IPEndPoint, byte[]> Send;
 
@@ -54,14 +67,14 @@ namespace r.io.server
                 //TODO: find other types
                 Task[] tc = cs.Connected.Select(u => Task.Run(() =>
                 {
-                    UdpPackage pack = ResponseCreators.Find(rc => rc.Type == 'n')?.Create(u.Player) ?? new();
+                    UdpPackage pack = responseCreators.Find(rc => rc.Type == 'n')?.Create(u.Player) ?? new();
 
                     byte[] data = s.Serialize(pack);
                     Send?.Invoke(u.EndPoint, data);
                 })).ToArray();
                 Task[] tt = timeoutedUsers.Select(u => Task.Run(() =>
                 {
-                    UdpPackage pack = ResponseCreators.Find(rc => rc.Type == 't')?.Create();
+                    UdpPackage pack = responseCreators.Find(rc => rc.Type == 't')?.Create();
 
                     byte[] data = s.Serialize(pack);
                     Send?.Invoke(u.EndPoint, data);
@@ -90,7 +103,7 @@ namespace r.io.server
             while (true)
             {
                 //Waiting for elements in queue
-                while (queue.Count == 0);
+                while (queue.Count == 0) ;
                 //considering queue.Count > 0
                 lock (queue)
                 {
@@ -105,7 +118,7 @@ namespace r.io.server
                     //-[d]isconnect from game
                     //-[e]mpty pack (to avoid timeout)
                     //TODO: find other types
-                    RequestHandlers.Find(rc => rc.Type == pack.Type)?.Handle(request, pack);
+                    requestHandlers.Find(rc => rc.Type == pack.Type)?.Handle(request, pack);
                     tickIPs.Add(request.RemoteEndPoint);
                 }
             }

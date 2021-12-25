@@ -20,12 +20,9 @@ namespace r.io.server
             GameServiceCollection gameServices = ConfigureGameServices();
             RequestProcessor processor = new();
 
-            processor.RequestHandlers = PackageProcessorActivator.GetRequestHandlers(gameServices);
-            processor.ResponseCreators = PackageProcessorActivator.GetResponseCreators(gameServices);
-
             l.gameLoopManager = gameServices.Get<GameLoopManager>();
             l.requestProcessor = processor;
-            processor.GameLoopManager = gameServices.Get<GameLoopManager>();
+            processor.GameServices = gameServices;
 
             return l;
         }
