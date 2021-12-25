@@ -1,4 +1,5 @@
 ﻿using r.io.shared.Services;
+using System.Threading.Tasks;
 
 namespace r.io.shared.PackageProcessing
 {
@@ -7,16 +8,9 @@ namespace r.io.shared.PackageProcessing
         protected GameServiceCollection gameServices;
 
         public GameServiceCollection GameServices { set => gameServices = value; }
+        public abstract int Priority { get; }
         public abstract char Type { get; }
 
-        protected abstract void Configure(UdpPackage pack, params object[] @params);
-        
-        public UdpPackage Create(params object[] @params)
-        {
-            UdpPackage pack = new();
-            Configure(pack, @params);
-            pack.Type = Type;
-            return pack;
-        }
+        public abstract Task[] Broadcast();
     }
 }

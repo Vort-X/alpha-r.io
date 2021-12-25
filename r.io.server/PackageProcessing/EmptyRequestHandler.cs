@@ -11,7 +11,7 @@ namespace r.io.server.PackageProcessing
 
         public override void Handle(UdpReceiveResult result, UdpPackage pack)
         {
-            gameServices.Get<ConnectionService>().Get(result.RemoteEndPoint).UpdateLastPing();
+            gameServices.Get<ConnectionService>().Get(result.RemoteEndPoint)?.UpdateLastPing();
         }
     }
 }

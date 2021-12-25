@@ -44,8 +44,6 @@ namespace r.io.server
             }
         }
 
-        public event Action<IPEndPoint, byte[]> Send;
-
         public void AddToQueue(UdpReceiveResult request)
         {
             queue.Enqueue(request);
@@ -55,32 +53,12 @@ namespace r.io.server
         {
             lock (queue)
             {
-                var cs = GameServices.Get<ConnectionService>();
-                var s = GameServices.Get<Serializer<UdpPackage>>();
-                var timeoutedUsers = cs.Timeouted;
-                cs.RemoveTimeouted();
-                //Types of UdpPackage responses:
-                //-[n]earby GameAreas
-                //-round [e]nd and player top
-                //-[t]imeout
-                //-maybe [d]eath
-                //TODO: find other types
-                Task[] tc = cs.Connected.Select(u => Task.Run(() =>
-                {
-                    UdpPackage pack = responseCreators.Find(rc => rc.Type == 'n')?.Create(u.Player) ?? new();
-
-                    byte[] data = s.Serialize(pack);
-                    Send?.Invoke(u.EndPoint, data);
-                })).ToArray();
-                Task[] tt = timeoutedUsers.Select(u => Task.Run(() =>
-                {
-                    UdpPackage pack = responseCreators.Find(rc => rc.Type == 't')?.Create();
-
-                    byte[] data = s.Serialize(pack);
-                    Send?.Invoke(u.EndPoint, data);
-                })).ToArray();
-                Task.WaitAll(tt);
-                Task.WaitAll(tc);
+                if (gameServices.Get<ConnectionService>().Connected.Count == 0) return;
+                var responses = responseCreators.OrderBy(rc => rc.Priority)
+                    .SelectMany(rc => rc.Broadcast())
+                    .ToArray();
+                Task.WaitAll(responses);
+                tickIPs.Clear();
             }
         }
 
@@ -94,7 +72,7 @@ namespace r.io.server
             //Processing requests in queue
             new Thread(StartProcess).Start();
             //Sending to clients data every tick
-            broadcastTimer = new Timer(_ => { Broadcast(); tickIPs.Clear(); }, null, 0, 1000 / Server.TicksPerSecond);
+            broadcastTimer = new Timer(_ => Broadcast(), null, 0, 1000 / Server.TicksPerSecond);
         }
 
         private void StartProcess()
@@ -112,12 +90,6 @@ namespace r.io.server
                     //skip handling if client has already sent pack 
                     if (tickIPs.Any(ip => ip == request.RemoteEndPoint)) continue;
                     var pack = s.Deserialize(request.Buffer);
-                    //Types of UdpPackage requests:
-                    //-[c]onnect to game
-                    //-[m]ove by vector (or angle)
-                    //-[d]isconnect from game
-                    //-[e]mpty pack (to avoid timeout)
-                    //TODO: find other types
                     requestHandlers.Find(rc => rc.Type == pack.Type)?.Handle(request, pack);
                     tickIPs.Add(request.RemoteEndPoint);
                 }

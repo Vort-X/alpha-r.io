@@ -1,14 +1,10 @@
 ﻿using r.io.model.Services;
 using r.io.model.Services.Abstract;
-using r.io.server.PackageProcessing;
+using r.io.server.Constants;
 using r.io.server.Services;
 using r.io.shared;
 using r.io.shared.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Net.Sockets;
 
 namespace r.io.server
 {
@@ -16,15 +12,17 @@ namespace r.io.server
     {
         public static Listener Create()
         {
-            Listener l = new();
+            UdpClient client = new(Server.Port);
+            Listener listener = new(client);
             GameServiceCollection gameServices = ConfigureGameServices();
             RequestProcessor processor = new();
 
-            l.gameLoopManager = gameServices.Get<GameLoopManager>();
-            l.requestProcessor = processor;
+            listener.gameLoopManager = gameServices.Get<GameLoopManager>();
+            listener.requestProcessor = processor;
             processor.GameServices = gameServices;
+            gameServices.Get<BroadcastService>().Server = client;
 
-            return l;
+            return listener;
         }
 
         private static GameServiceCollection ConfigureGameServices()
@@ -33,11 +31,13 @@ namespace r.io.server
 
             GameFactoryImpl factory = new();
             GameLoopManagerImpl loop = new(factory);
+            BroadcastService broadcastService = new();
             ConnectionService connectionService = new();
             Serializer<UdpPackage> serializer = new();
 
             gameServices.Add(factory);
             gameServices.Add(loop);
+            gameServices.Add(broadcastService);
             gameServices.Add(connectionService);
             gameServices.Add(serializer);
 
