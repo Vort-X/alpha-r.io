@@ -2,6 +2,7 @@
 using r.io.server.Services;
 using r.io.shared;
 using r.io.shared.PackageProcessing;
+using r.io.shared.Services;
 using r.io.shared.UdpGraph;
 using System;
 using System.Collections.Generic;
@@ -14,15 +15,26 @@ namespace r.io.server.PackageProcessing
 {
     class MoveRequestHandler : RequestHandler
     {
+        private ConnectionService connectionService;
+        private PlayerService playerService;
+
         public override char Type => 'm';
+
+        public override GameServiceCollection GameServices
+        {
+            set
+            {
+                connectionService = value.Get<ConnectionService>();
+                playerService = value.Get<GameLoopManager>().playerService;
+            }
+        }
 
         public override void Handle(UdpReceiveResult result, UdpPackage pack)
         {
             if (pack.Node is not MoveNode) return;
-            var cs = gameServices.Get<ConnectionService>();
-            var conn = cs.Get(result.RemoteEndPoint);
+            var conn = connectionService.Get(result.RemoteEndPoint);
             var move = pack.Node as MoveNode;
-            gameServices.Get<PlayerService>().Move(conn.Player, move.X, move.Y);
+            playerService.Move(conn.Player, move.X, move.Y);
             conn.UpdateLastPing();
         }
     }

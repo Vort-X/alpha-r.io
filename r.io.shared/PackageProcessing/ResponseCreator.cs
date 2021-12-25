@@ -5,9 +5,7 @@ namespace r.io.shared.PackageProcessing
 {
     public abstract class ResponseCreator
     {
-        protected GameServiceCollection gameServices;
-
-        public GameServiceCollection GameServices { set => gameServices = value; }
+        public abstract GameServiceCollection GameServices { set; }
         public abstract int Priority { get; }
         public abstract char Type { get; }
 

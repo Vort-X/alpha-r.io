@@ -1,6 +1,8 @@
-﻿using r.io.server.Services;
+﻿using r.io.model.Services.Abstract;
+using r.io.server.Services;
 using r.io.shared;
 using r.io.shared.PackageProcessing;
+using r.io.shared.Services;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -8,19 +10,31 @@ namespace r.io.server.PackageProcessing
 {
     internal class TimeoutResponseCreator : ResponseCreator
     {
-        public override char Type => 't';
+        private BroadcastService broadcastService;
+        private ConnectionService connectionService;
+        private Serializer<UdpPackage> serializer;
 
         public override int Priority => 0;
+        public override char Type => 't';
+
+        public override GameServiceCollection GameServices
+        {
+            set
+            {
+                broadcastService = value.Get<BroadcastService>();
+                connectionService = value.Get<ConnectionService>();
+                serializer = value.Get<Serializer<UdpPackage>>();
+            }
+        }
 
         public override Task[] Broadcast()
         {
-            var bs = gameServices.Get<BroadcastService>();
-            var cs = gameServices.Get<ConnectionService>();
-            var s = gameServices.Get<Serializer<UdpPackage>>();
             var pack = new UdpPackage() { Type = Type };
-            var data = s.Serialize(pack);
-            var tasks = cs.Timeouted.Select(conn => bs.Send(conn.EndPoint, data)).ToArray();
-            cs.RemoveTimeouted();
+            var data = serializer.Serialize(pack);
+            var tasks = connectionService.Timeouted
+                .Select(conn => broadcastService.Send(conn.EndPoint, data))
+                .ToArray();
+            connectionService.RemoveTimeouted();
             return tasks;
         }
     }
