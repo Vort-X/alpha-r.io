@@ -6,6 +6,7 @@ using r.io.shared;
 using r.io.shared.PackageProcessing;
 using r.io.shared.Services;
 using r.io.shared.UdpGraph;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -40,7 +41,11 @@ namespace r.io.server.PackageProcessing
                 var areas = gameLoopManager.playerService.getGameAreasAround(conn.Player.x, conn.Player.y);
                 pack.Node = new NearbyAreasNode()
                 {
-                    AreaParts = areas.Select(a => a.ToNode()).ToList(),
+                    Foodes = areas.SelectMany(a => a.killableObjects).Where(k => k is FoodCircle).Select(f => f.ToNode()).ToList(),
+                    Players = new(areas.SelectMany(a => a.killableObjects)
+                        .Where(k => k is PlayerCircle)
+                        .Cast<PlayerCircle>()
+                        .Select(p => KeyValuePair.Create(p.name, p.ToNode()))),
                 };
                 var data = serializer.Serialize(pack);
                 return broadcastService.Send(conn.EndPoint, data);

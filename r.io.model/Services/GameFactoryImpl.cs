@@ -14,7 +14,7 @@ namespace r.io.model.Services
             int gameAreaSide = 1000;
             int areaPartSide = 100;
             double foodRadius = 5;
-            int foodAmount = 40;
+            int foodAmount = 40*100;
 
             Timer roundTimer = new Timer(100 * roundDurationInSeconds);
 
