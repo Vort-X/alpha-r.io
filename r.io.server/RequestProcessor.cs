@@ -1,7 +1,10 @@
-﻿using r.io.model.Services.Abstract;
+﻿using r.io.model.GameEntities;
+using r.io.model.Services.Abstract;
 using r.io.server.Constants;
+using r.io.server.Services;
 using r.io.shared;
 using r.io.shared.PackageProcessing;
+using r.io.shared.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,32 +18,18 @@ namespace r.io.server
 {
     class RequestProcessor : IDisposable
     {
-        private readonly List<UserConnection> connectedUsers;
         private readonly RequestQueue queue;
-        private readonly Serializer<UdpPackage> serializer;
+        private readonly List<IPEndPoint> tickIPs;
         private Timer broadcastTimer;
-        private GameLoopManager gameLoopManager;
 
         public RequestProcessor()
         {
-            connectedUsers = new List<UserConnection>();
-            queue = new RequestQueue();
-            serializer = new Serializer<UdpPackage>();
+            queue = new();
         }
 
+        public GameServiceCollection GameServices { get; set; }
         public List<RequestHandler> RequestHandlers { get; set; }
         public List<ResponseCreator> ResponseCreators { get; set; }
-
-        //TODO: remove this garbage
-        public GameLoopManager GameLoopManager
-        {
-            get => gameLoopManager;
-            internal set
-            {
-                value.RoundEnded += OnRoundEnded;
-                gameLoopManager = value;
-            }
-        }
 
         public event Action<IPEndPoint, byte[]> Send;
 
@@ -53,27 +42,28 @@ namespace r.io.server
         {
             lock (queue)
             {
-                var timeoutedUsers = connectedUsers.Where(x => x.Timeouted).ToList();
-                timeoutedUsers.ForEach(x => connectedUsers.Remove(x));
-                Task[] tc = connectedUsers.Select(u => Task.Run(() =>
+                var cs = GameServices.Get<ConnectionService>();
+                var s = GameServices.Get<Serializer<UdpPackage>>();
+                var timeoutedUsers = cs.Timeouted;
+                cs.RemoveTimeouted();
+                //Types of UdpPackage responses:
+                //-[n]earby GameAreas
+                //-round [e]nd and player top
+                //-[t]imeout
+                //-maybe [d]eath
+                //TODO: find other types
+                Task[] tc = cs.Connected.Select(u => Task.Run(() =>
                 {
-                    //TODO: refactor this as response creators
-                    //Types of UdpPackage responses:
-                    //-[n]earby GameAreas
-                    //-round [e]nd and player top
-                    //-[t]imeout
-                    //TODO: find other types
                     UdpPackage pack = ResponseCreators.Find(rc => rc.Type == 'n')?.Create(u.Player) ?? new();
 
-                    byte[] data = serializer.Serialize(pack);
+                    byte[] data = s.Serialize(pack);
                     Send?.Invoke(u.EndPoint, data);
                 })).ToArray();
                 Task[] tt = timeoutedUsers.Select(u => Task.Run(() =>
                 {
-                    UdpPackage pack = new();
-                    pack.Type = 't';
+                    UdpPackage pack = ResponseCreators.Find(rc => rc.Type == 't')?.Create();
 
-                    byte[] data = serializer.Serialize(pack);
+                    byte[] data = s.Serialize(pack);
                     Send?.Invoke(u.EndPoint, data);
                 })).ToArray();
                 Task.WaitAll(tt);
@@ -91,7 +81,7 @@ namespace r.io.server
             //Processing requests in queue
             new Thread(StartProcess).Start();
             //Sending to clients data every tick
-            broadcastTimer = new Timer(_ => Broadcast(), null, 0, 1000 / Server.TicksPerSecond);
+            broadcastTimer = new Timer(_ => { Broadcast(); tickIPs.Clear(); }, null, 0, 1000 / Server.TicksPerSecond);
         }
 
         private void StartProcess()
@@ -104,23 +94,19 @@ namespace r.io.server
                 //considering queue.Count > 0
                 lock (queue)
                 {
+                    var s = GameServices.Get<Serializer<UdpPackage>>();
                     var request = queue.Dequeue();
-                    var pack = serializer.Deserialize(request.Buffer);
+                    //skip handling if client has already sent pack 
+                    if (tickIPs.Any(ip => ip == request.RemoteEndPoint)) continue;
+                    var pack = s.Deserialize(request.Buffer);
                     //Types of UdpPackage requests:
                     //-[c]onnect to game
                     //-[m]ove by vector (or angle)
                     //-[d]isconnect from game
                     //-[e]mpty pack (to avoid timeout)
                     //TODO: find other types
-                    RequestHandlers.Find(rc => rc.Type == pack.Type)?.Handle(pack);
-                    //TODO: fix ifs
-                    if (pack.Type == 'c') connectedUsers.Add(new() 
-                    { 
-                        EndPoint = request.RemoteEndPoint, 
-                        Player = gameLoopManager.gameService.RegisterPlayer("mihailo") 
-                    });
-                    if (pack.Type == 'd') connectedUsers.RemoveAll(c => c.EndPoint == request.RemoteEndPoint);
-                    connectedUsers.Find(u => u.EndPoint.Equals(request.RemoteEndPoint))?.UpdateLastPing();
+                    RequestHandlers.Find(rc => rc.Type == pack.Type)?.Handle(request, pack);
+                    tickIPs.Add(request.RemoteEndPoint);
                 }
             }
         }

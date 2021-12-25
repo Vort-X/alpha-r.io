@@ -1,4 +1,5 @@
 ﻿using r.io.shared.Services;
+using System.Net.Sockets;
 
 namespace r.io.shared.PackageProcessing
 {
@@ -9,6 +10,6 @@ namespace r.io.shared.PackageProcessing
         public GameServiceCollection GameServices { set => gameServices = value; }
         public abstract char Type { get; }
 
-        public abstract void Handle(UdpPackage pack);
+        public abstract void Handle(UdpReceiveResult result, UdpPackage pack);
     }
 }

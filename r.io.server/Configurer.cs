@@ -1,6 +1,8 @@
 ﻿using r.io.model.Services;
 using r.io.model.Services.Abstract;
 using r.io.server.PackageProcessing;
+using r.io.server.Services;
+using r.io.shared;
 using r.io.shared.Services;
 using System;
 using System.Collections.Generic;
@@ -17,24 +19,31 @@ namespace r.io.server
             Listener l = new();
             GameServiceCollection gameServices = ConfigureGameServices();
             RequestProcessor processor = new();
+
             processor.RequestHandlers = PackageProcessorActivator.GetRequestHandlers(gameServices);
             processor.ResponseCreators = PackageProcessorActivator.GetResponseCreators(gameServices);
 
             l.gameLoopManager = gameServices.Get<GameLoopManager>();
             l.requestProcessor = processor;
             processor.GameLoopManager = gameServices.Get<GameLoopManager>();
+
             return l;
         }
 
         private static GameServiceCollection ConfigureGameServices()
         {
             GameServiceCollection gameServices = new();
+
             GameFactoryImpl factory = new();
             GameLoopManagerImpl loop = new(factory);
-            gameServices.Add(loop);
+            ConnectionService connectionService = new();
+            Serializer<UdpPackage> serializer = new();
+
             gameServices.Add(factory);
-            //gameServices.Add(loop.gameService);
-            //gameServices.Add(loop.playerService);
+            gameServices.Add(loop);
+            gameServices.Add(connectionService);
+            gameServices.Add(serializer);
+
             return gameServices;
         }
     }

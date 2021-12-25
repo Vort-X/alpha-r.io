@@ -16,7 +16,7 @@ namespace r.io.server.PackageProcessing
         {
             var player = @params[0] as PlayerCircle;
             var areas = gameServices.Get<GameLoopManager>().playerService.getGameAreasAround(player.x, player.y);
-            pack["areas"] = new NearbyAreasNode()
+            pack.Node = new NearbyAreasNode()
             {
                 AreaParts = areas.Select(a => a.ToNode()).ToList(),
             };

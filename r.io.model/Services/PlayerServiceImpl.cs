@@ -45,9 +45,7 @@ namespace r.io.model.Services
             int[] xCoords = { part.xLeft - sideRange, part.xLeft, part.xLeft + sideRange };
             int[] yCoords = { part.yTop - sideRange, part.yTop, part.yTop + sideRange };
             return game.gameArea.parts
-                .Where(i => (!i.Equals(part))
-                            && (xCoords.Contains(i.xLeft))
-                            && (yCoords.Contains(i.yTop)))
+                .Where(i => xCoords.Contains(i.xLeft) && yCoords.Contains(i.yTop))
                 .ToList();
         }
 
