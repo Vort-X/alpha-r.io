@@ -15,7 +15,7 @@ namespace r.io.server.PackageProcessing
     {
         private BroadcastService broadcastService;
         private ConnectionService connectionService;
-        private PlayerService playerService;
+        private GameLoopManager gameLoopManager;
         private Serializer<UdpPackage> serializer;
 
         public override int Priority => 1;
@@ -27,7 +27,7 @@ namespace r.io.server.PackageProcessing
             {
                 broadcastService = value.Get<BroadcastService>();
                 connectionService = value.Get<ConnectionService>();
-                playerService = value.Get<GameLoopManager>().playerService;
+                gameLoopManager = value.Get<GameLoopManager>();
                 serializer = value.Get<Serializer<UdpPackage>>();
             }
         }
@@ -37,7 +37,7 @@ namespace r.io.server.PackageProcessing
             return connectionService.Connected.Select(conn =>
             {
                 var pack = new UdpPackage() { Type = Type };
-                var areas = playerService.getGameAreasAround(conn.Player.x, conn.Player.y);
+                var areas = gameLoopManager.playerService.getGameAreasAround(conn.Player.x, conn.Player.y);
                 pack.Node = new NearbyAreasNode()
                 {
                     AreaParts = areas.Select(a => a.ToNode()).ToList(),

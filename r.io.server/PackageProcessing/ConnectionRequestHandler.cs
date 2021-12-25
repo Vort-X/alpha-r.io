@@ -1,4 +1,6 @@
-﻿using r.io.model.Services.Abstract;
+﻿using System;
+using System.Diagnostics;
+using r.io.model.Services.Abstract;
 using r.io.server.Services;
 using r.io.shared;
 using r.io.shared.PackageProcessing;
@@ -11,7 +13,7 @@ namespace r.io.server.PackageProcessing
     class ConnectionRequestHandler : RequestHandler
     {
         private ConnectionService connectionService;
-        private GameService gameService;
+        private GameLoopManager gameLoopManager;
 
         public override char Type => 'c';
 
@@ -20,7 +22,7 @@ namespace r.io.server.PackageProcessing
             set 
             {
                 connectionService = value.Get<ConnectionService>();
-                gameService = value.Get<GameLoopManager>().gameService;
+                gameLoopManager = value.Get<GameLoopManager>();
             }
         }
 
@@ -28,7 +30,7 @@ namespace r.io.server.PackageProcessing
         {
             if (pack.Node is not UsernameNode) return;
             var conn = connectionService.Add(result.RemoteEndPoint);
-            conn.Player = gameService.RegisterPlayer((pack.Node as UsernameNode).Username);
+            conn.Player = gameLoopManager.gameService.RegisterPlayer((pack.Node as UsernameNode).Username);
             conn.UpdateLastPing();
         }
     }

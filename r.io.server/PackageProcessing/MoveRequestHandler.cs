@@ -16,7 +16,7 @@ namespace r.io.server.PackageProcessing
     class MoveRequestHandler : RequestHandler
     {
         private ConnectionService connectionService;
-        private PlayerService playerService;
+        private GameLoopManager gameLoopManager;
 
         public override char Type => 'm';
 
@@ -25,7 +25,7 @@ namespace r.io.server.PackageProcessing
             set
             {
                 connectionService = value.Get<ConnectionService>();
-                playerService = value.Get<GameLoopManager>().playerService;
+                gameLoopManager = value.Get<GameLoopManager>();
             }
         }
 
@@ -34,7 +34,7 @@ namespace r.io.server.PackageProcessing
             if (pack.Node is not MoveNode) return;
             var conn = connectionService.Get(result.RemoteEndPoint);
             var move = pack.Node as MoveNode;
-            playerService.Move(conn.Player, move.X, move.Y);
+            gameLoopManager.playerService.Move(conn.Player, move.X, move.Y);
             conn.UpdateLastPing();
         }
     }
