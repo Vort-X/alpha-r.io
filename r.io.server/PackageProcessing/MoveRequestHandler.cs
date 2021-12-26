@@ -33,6 +33,7 @@ namespace r.io.server.PackageProcessing
         {
             if (pack.Node is not MoveNode) return;
             var conn = connectionService.Get(result.RemoteEndPoint);
+            if (conn == null) return;
             var move = pack.Node as MoveNode;
             gameLoopManager.playerService.Move(conn.Player, move.X, move.Y);
             gameLoopManager.playerService.TryEat(conn.Player);

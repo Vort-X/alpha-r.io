@@ -26,6 +26,7 @@ namespace r.io.server.PackageProcessing
         public override void Handle(UdpReceiveResult result, UdpPackage pack)
         {
             var conn = connectionService.Get(result.RemoteEndPoint);
+            if (conn == null) return;
             gameLoopManager.playerService.TryEat(conn.Player);
             connectionService.Get(result.RemoteEndPoint)?.UpdateLastPing();
         }

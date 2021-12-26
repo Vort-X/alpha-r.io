@@ -94,6 +94,7 @@ namespace r.io.model.Services
         {
             killer.radius += Math.Sqrt(food.radius) / 3;
             getParts().Find(i => i.killableObjects.Contains(food)).killableObjects.Remove(food);
+            food.isAlive = false;
         }
 
         private List<AreaPart> getParts()
