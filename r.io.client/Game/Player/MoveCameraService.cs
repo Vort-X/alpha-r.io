@@ -13,6 +13,7 @@ public class MoveCameraService : Node2D
 		_playerState = GetNode<PlayerState>("/root/MenuState");
 		GetNode<UdpClientNode>("/root/UdpClient").OnNearby += node =>
 		{
+			if (!node.Players.ContainsKey(_playerState.UserName)) return;
 			var player = node.Players
 				.FirstOrDefault(p => p.Key == _playerState.UserName)
 				.Value;

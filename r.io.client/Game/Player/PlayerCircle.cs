@@ -17,7 +17,7 @@ public class PlayerCircle : Node2D
 	public override void _Process(float delta)
 	{
 		Update();
-		_label.Text = " " + Nickname;
+		_label.BbcodeText = $"[center]{Nickname}[/center]";
 	}
 
 	public override void _Draw()

@@ -20,11 +20,12 @@ namespace R.io.client.Game.Player
 			
 			GetNode<UdpClientNode>("/root/UdpClient").OnNearby += node =>
 			{
-				var player = node.Players
-					.FirstOrDefault(p => p.Key == _playerState.UserName);
+				if (!node.Players.ContainsKey(_playerState.UserName)) return;
+				var (username, circle) = node.Players
+					.First(p => p.Key == _playerState.UserName);
 
-				_playerState.PlayerScore = (float)player.Value.Radius;
-				DrawPlayer(player.Value, player.Key);
+				_playerState.PlayerScore = (float)circle.Radius;
+				DrawPlayer(circle, username);
 			};
 		}
 

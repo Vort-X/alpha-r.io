@@ -20,7 +20,7 @@ namespace R.io.client.Game.Player
 
 			var direction = new Vector2(horizontal, vertical).Normalized();
 			
-			GD.Print($"Direction: {direction}");
+			
 			_udpClient.SetMovementDirection(direction);
 		}
 	}

@@ -34,21 +34,29 @@ namespace R.io.client.Network
 		{
 			if (Client.Available > 0)
 			{
-				var result = Client.ReceiveAsync().Result;
-
-				var package = _serializer.Deserialize(result.Buffer);
-
-				switch(package.Node)
+				for (int i = 0; i < Client.Available; i++)
 				{
-					case NearbyAreasNode nearby:
-						OnNearby?.Invoke(nearby);
-						break;
-					case TopPlayersNode topPlayers:
-						OnTopPlayers?.Invoke(topPlayers);
-						break;
-					case PlayerDeathNode _:
-						OnPlayerDeath?.Invoke();
-						break;
+					var result = Client.ReceiveAsync().Result;
+
+					var package = _serializer.Deserialize(result.Buffer);
+
+					switch (package.Node)
+					{
+						case NearbyAreasNode nearby:
+							OnNearby?.Invoke(nearby);
+							break;
+						case TopPlayersNode topPlayers:
+							OnTopPlayers?.Invoke(topPlayers);
+							break;
+						case PlayerDeathNode _:
+							OnPlayerDeath?.Invoke();
+							OnNearby = null;
+							OnTopPlayers = null;
+							OnPlayerDeath = null;
+							return;
+					}
+
+					GD.Print(package.Type);
 				}
 
 				var move = new UdpPackage()
@@ -60,15 +68,19 @@ namespace R.io.client.Network
 						Y = _inputMovement.y,
 					}
 				};
-				
+
 				Send(move);
 			}
 		}
 
 		public void Send(UdpPackage package)
 		{
-			var data = _serializer.Serialize(package);
-			Client.Send(data, data.Length, Host, HostPort);
+			try
+			{
+				var data = _serializer.Serialize(package);
+				Client.Send(data, data.Length, Host, HostPort);
+			}
+			catch (SocketException e) { }
 		}
 
 		public void SetMovementDirection(Vector2 movement)
