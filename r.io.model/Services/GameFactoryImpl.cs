@@ -45,7 +45,7 @@ namespace r.io.model.Services
         public PlayerCircle createPlayer(Game game, string name)
         {
             int minimalRadius = 5;
-            float velocity = 10;
+            float velocity = 3;
 
 
             double x = generateRandomCoords(game.gameArea.maxX);
