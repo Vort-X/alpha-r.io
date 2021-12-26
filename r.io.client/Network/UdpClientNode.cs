@@ -28,6 +28,18 @@ namespace R.io.client.Network
 		{
 			Client = new UdpClient();
 			_serializer = new Serializer<UdpPackage>();
+			
+			if (System.IO.File.Exists("client.cfg"))
+			{
+				using var f = System.IO.File.Open("client.cfg", System.IO.FileMode.Open);
+				using var r = new System.IO.StreamReader(f);
+				var endpoint = r.ReadLine();
+				if (!string.IsNullOrEmpty(endpoint))
+				{
+					Host = endpoint[..endpoint.IndexOf(':')];
+					HostPort = int.Parse(endpoint[(endpoint.IndexOf(':')+1)..]);
+				}
+			}
 		}
 
 		public override void _Process(float delta)
