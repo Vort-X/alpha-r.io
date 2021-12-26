@@ -19,19 +19,25 @@ namespace r.io.model.Services
         public void Move(PlayerCircle player, double x, double y)
         {
             if (x == 0 && y == 0) return;
+
+            var newCoords = GetNewPlayerCoords(player, x, y);
+            double newX = newCoords.Item1;
+            double newY = newCoords.Item2;
             
-            var nX = x / Math.Sqrt(x * x + y * y);
-            var nY = y / Math.Sqrt(x * x + y * y);
-            AreaPart partBeforeMove = getAreaPart(player.x, player.y);
-            double newX = player.x + nX * player.velocity / player.radius;
-            double newY = player.y + nY * player.velocity / player.radius;
-            player.x = newX;
-            player.y = newY;
-            AreaPart newAreaPart = getAreaPart(player.x, player.y);
-            if(!newAreaPart.Equals(partBeforeMove))
+            if (newX > 0 && newX < game.gameArea.maxX && newY > 0 && newY < game.gameArea.maxY)
             {
-                changeArea(player, partBeforeMove, newAreaPart);
+                AreaPart partBeforeMove = getAreaPart(player.x, player.y);
+                player.x = newX;
+                player.y = newY;
+
+                AreaPart newAreaPart = getAreaPart(player.x, player.y);
+
+                if (!newAreaPart.Equals(partBeforeMove))
+                {
+                    changeArea(player, partBeforeMove, newAreaPart);
+                }
             }
+            
         }
 
         public void TryEat(CircleGameObject player)
@@ -57,6 +63,19 @@ namespace r.io.model.Services
         {
             int sideRange = game.gameArea.side;
             return game.gameArea.parts.Find(i => (x >= i.xLeft && x < i.xLeft + sideRange) && (y >= i.yTop && y < i.yTop + sideRange));
+        }
+
+        private (double, double) GetNewPlayerCoords(PlayerCircle player, double x, double y)
+        {
+            double normalizedX = Normalize(x, y);
+            double normalizedY = Normalize(y, x);
+            return (player.x + normalizedX * player.velocity / player.radius, 
+                player.y + normalizedY * player.velocity / player.radius);
+        }
+
+        private double Normalize(double toNorm, double secondCoord)
+        {
+            return toNorm / Math.Sqrt(toNorm * toNorm + secondCoord * secondCoord);
         }
 
         private bool isEatable(CircleGameObject player, CircleGameObject food)
