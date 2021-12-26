@@ -1,13 +1,13 @@
 ﻿namespace r.io.model.Services.Abstract
 {
-    public delegate void RoundEndedEvent();
+    public delegate void RoundStartedEvent();
 
     public interface GameLoopManager
     {
         GameService gameService { get; }
         PlayerService playerService { get; }
 
-        event RoundEndedEvent RoundEnded;
+        event RoundStartedEvent RoundStarted;
 
         void Start();
     }

@@ -32,7 +32,7 @@ namespace r.io.server
             GameFactoryImpl factory = new();
             GameLoopManagerImpl loop = new(factory);
             BroadcastService broadcastService = new();
-            ConnectionService connectionService = new();
+            ConnectionService connectionService = new(loop);
             Serializer<UdpPackage> serializer = new();
 
             gameServices.Add(factory);

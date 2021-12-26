@@ -11,7 +11,6 @@ namespace r.io.model.Constants
     {
         private static readonly int Second = 1000;
 
-        public static readonly long Duration = 100 * Second;
-        public static readonly long PauseBeforeNext = 10 * Second;
+        public static readonly long Duration = 5 * 60 * Second;
     }
 }

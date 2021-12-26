@@ -29,7 +29,7 @@ namespace r.io.server
                         var request = client.ReceiveAsync();
                         //awaiting result, current thread blocks until package received
                         var result = request.GetAwaiter().GetResult(); 
-                        Console.WriteLine($"Receiving data at {DateTime.Now}");
+                        //Console.WriteLine($"Receiving data at {DateTime.Now}");
                         requestProcessor.AddToQueue(result);
                     }
                     catch (SocketException)

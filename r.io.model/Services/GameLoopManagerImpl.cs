@@ -10,10 +10,11 @@ namespace r.io.model.Services
     public class GameLoopManagerImpl : GameLoopManager
     {
         private readonly GameFactory factory;
+        private CoolerTimer timer;
 
         //Invoke when round time expires
         //i.e.: game.timerFromRoundStart.Elapsed += (s, e) => RoundEnded?.Invoke();
-        public event RoundEndedEvent RoundEnded;
+        public event RoundStartedEvent RoundStarted;
 
         public GameService gameService { get; private set; }
         public PlayerService playerService { get; private set; }
@@ -26,8 +27,8 @@ namespace r.io.model.Services
         public void Start()
         {
             //Method StartNewGame calls every Round.Duration + Round.PauseBeforeNext milliseconds
-            //Delay before first execution - 3000 milliseconds
-            CoolerTimer t = new(StartNewGame, new object(), 1000, Round.Duration + Round.PauseBeforeNext);
+            //Delay before first execution - 1000 milliseconds
+            timer = new(StartNewGame, new object(), 1000, Round.Duration);
         }
 
         private void StartNewGame(object state)
@@ -37,8 +38,8 @@ namespace r.io.model.Services
             this.gameService = new GameServiceImpl(game, factory, playerService);
             game.timerFromRoundStart.Interval = Round.Duration;
             game.timerFromRoundStart.AutoReset = false;
-            game.timerFromRoundStart.Elapsed += (s, e) => RoundEnded?.Invoke();
             game.timerFromRoundStart.Start();
+            RoundStarted?.Invoke();
             Console.WriteLine("New Round Started");
         }
     }

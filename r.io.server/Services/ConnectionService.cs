@@ -1,4 +1,5 @@
-﻿using System;
+﻿using r.io.model.Services.Abstract;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -10,10 +11,13 @@ namespace r.io.server.Services
     class ConnectionService
     {
         private readonly List<UserConnection> connectedUsers;
+        private readonly GameLoopManager gameLoopManager;
 
-        public ConnectionService()
+        public ConnectionService(GameLoopManager gameLoopManager)
         {
             connectedUsers = new();
+            this.gameLoopManager = gameLoopManager;
+            gameLoopManager.RoundStarted += OnRoundStarted;
         }
 
         public IReadOnlyList<UserConnection> Connected => connectedUsers;
@@ -29,6 +33,11 @@ namespace r.io.server.Services
         public UserConnection Get(IPEndPoint endpoint)
         {
             return connectedUsers.Find(x => x.EndPoint.Equals(endpoint));
+        }
+
+        public void OnRoundStarted()
+        {
+            connectedUsers.ForEach(conn => conn.Player = gameLoopManager.gameService.RegisterPlayer(conn.Player.name));
         }
 
         public void Remove(IPEndPoint endpoint)
