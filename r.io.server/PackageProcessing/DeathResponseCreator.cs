@@ -30,7 +30,7 @@ namespace r.io.server.PackageProcessing
 
         public override Task[] Broadcast()
         {
-            var dead = connectionService.Connected.Where(conn => !conn.Player.isAlive);
+            var dead = connectionService.Connected.Where(conn => !conn.Player.isAlive).ToList();
             Task[] tasks = dead.Select(conn =>
                            {
                                var pack = new UdpPackage() { Type = Type };
