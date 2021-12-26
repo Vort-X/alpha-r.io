@@ -9,5 +9,6 @@ namespace r.io.model.Services.Abstract
         void TryEat(CircleGameObject player);
         List<AreaPart> getGameAreasAround(double x, double y);
         AreaPart getAreaPart(double x, double y);
+        void Kill(CircleGameObject player);
     }
 }
