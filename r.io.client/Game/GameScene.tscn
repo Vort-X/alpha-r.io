@@ -1,9 +1,10 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Game/Field/Field.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Game/Player/MoveCameraService.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Game/Player/MovementInputService.cs" type="Script" id=3]
 [ext_resource path="res://Game/Player/PlayerDeathService.cs" type="Script" id=4]
+[ext_resource path="res://Game/lava.jpeg" type="Texture" id=5]
 
 [sub_resource type="Gradient" id=1]
 offsets = PoolRealArray( 0.00529101, 0.304233, 0.632275, 0.97619 )
@@ -11,13 +12,21 @@ colors = PoolColorArray( 0.476381, 0.647904, 0.890625, 1, 0.949219, 0.735525, 0.
 
 [sub_resource type="GradientTexture" id=2]
 gradient = SubResource( 1 )
-width = 1000
+width = 1020
 
 [node name="GameScene" type="Node"]
 
+[node name="Sprite" type="Sprite" parent="."]
+position = Vector2( 490, 535.5 )
+scale = Vector2( 0.2, 0.2 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( -366.993, -118.329, 6316.88, 6301.69 )
+region_filter_clip = true
+
 [node name="Background" type="Sprite" parent="."]
 position = Vector2( 500, 500 )
-scale = Vector2( 1, 1000 )
+scale = Vector2( 1, 1020 )
 texture = SubResource( 2 )
 
 [node name="Field" parent="." instance=ExtResource( 1 )]

@@ -41,12 +41,13 @@ namespace r.io.server.PackageProcessing
                 var areas = gameLoopManager.playerService.getGameAreasAround(conn.Player.x, conn.Player.y);
                 pack.Node = new NearbyAreasNode()
                 {
+                    Username = conn.Player.name,
                     Food = areas.SelectMany(a => a.killableObjects).Where(k => k is FoodCircle).Select(f => f.ToNode()).ToList(),
                     Players = new(areas.SelectMany(a => a.killableObjects)
                         .Where(k => k is PlayerCircle)
                         .Cast<PlayerCircle>()
                         .Select(p => KeyValuePair.Create(p.name, p.ToNode()))),
-                };
+                }; 
                 var data = serializer.Serialize(pack);
                 return broadcastService.Send(conn.EndPoint, data);
             }

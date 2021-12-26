@@ -31,13 +31,12 @@ namespace r.io.server.PackageProcessing
         {
             if (pack.Node is not UsernameNode) return;
             var username = (pack.Node as UsernameNode).Username;
-            if (string.IsNullOrEmpty(username)) return;
-            var actualName = username;
-            for (int i = 0; i < 6; i++)
+            var actualName = string.IsNullOrEmpty(username) ? "noname" : username;
+            for (int i = 0; i < 11; i++)
             {
                 bool nameTaken = connectionService.Connected.Any(conn => conn.Player.name == actualName);
+                if (nameTaken && i == 10) return;
                 if (nameTaken) actualName = $"{username}{i}";
-                else if (nameTaken && i == 6) return;
                 else break;
             }
             var conn = connectionService.Add(result.RemoteEndPoint);

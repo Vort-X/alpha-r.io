@@ -12,7 +12,7 @@ font_data = ExtResource( 1 )
 script = ExtResource( 2 )
 
 [node name="Font" type="Node2D" parent="."]
-scale = Vector2( 0.2, 0.2 )
+scale = Vector2( 0.22, 0.22 )
 
 [node name="RichTextLabel" type="RichTextLabel" parent="Font"]
 anchor_left = 0.5

@@ -17,11 +17,7 @@ public class ConnectionButton : Button
 	{
 		var connectionService = new ConnectionService(GetNode<UdpClientNode>("/root/UdpClient"));
 		
-		connectionService.Connect(
-			string.IsNullOrEmpty(_player.UserName) ? 
-				new Guid().ToString()[..8] 
-				: _player.UserName);
-		
+		connectionService.Connect(_player.UserName);
 		GetNode<SceneManager>("/root/SceneManager").SwitchToGame();
 	}
 }

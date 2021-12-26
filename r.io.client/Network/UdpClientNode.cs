@@ -43,6 +43,7 @@ namespace R.io.client.Network
 					switch (package.Node)
 					{
 						case NearbyAreasNode nearby:
+							GetNode<PlayerState>("/root/MenuState").UserName = nearby.Username;
 							OnNearby?.Invoke(nearby);
 							break;
 						case TopPlayersNode topPlayers:

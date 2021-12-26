@@ -1,10 +1,18 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://UI/Basketball.otf" type="DynamicFontData" id=1]
 [ext_resource path="res://UI/PlayAgainButton.cs" type="Script" id=2]
 [ext_resource path="res://UI/ExitButton.cs" type="Script" id=3]
 [ext_resource path="res://UI/PlayerScore.cs" type="Script" id=4]
 [ext_resource path="res://UI/TopPlayersLabel.cs" type="Script" id=5]
+
+[sub_resource type="Gradient" id=3]
+offsets = PoolRealArray( 0, 0.518519, 1 )
+colors = PoolColorArray( 0.129724, 0.796875, 0.781239, 1, 0.446544, 0.687425, 0.902339, 1, 0.681604, 0.60622, 0.992188, 1 )
+
+[sub_resource type="GradientTexture" id=4]
+gradient = SubResource( 3 )
+width = 1024
 
 [sub_resource type="DynamicFont" id=1]
 size = 24
@@ -24,6 +32,12 @@ custom_constants/margin_bottom = 150
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="Sprite" type="Sprite" parent="."]
+position = Vector2( 0, 300 )
+scale = Vector2( 1, 600 )
+texture = SubResource( 4 )
+offset = Vector2( 512, 0 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 margin_left = 100.0
