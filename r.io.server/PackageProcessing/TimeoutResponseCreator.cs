@@ -12,6 +12,7 @@ namespace r.io.server.PackageProcessing
     {
         private BroadcastService broadcastService;
         private ConnectionService connectionService;
+        private GameLoopManager gameLoopManager;
         private Serializer<UdpPackage> serializer;
 
         public override int Priority => 0;
@@ -23,6 +24,7 @@ namespace r.io.server.PackageProcessing
             {
                 broadcastService = value.Get<BroadcastService>();
                 connectionService = value.Get<ConnectionService>();
+                gameLoopManager = value.Get<GameLoopManager>();
                 serializer = value.Get<Serializer<UdpPackage>>();
             }
         }
@@ -34,6 +36,10 @@ namespace r.io.server.PackageProcessing
             var tasks = connectionService.Timeouted
                 .Select(conn => broadcastService.Send(conn.EndPoint, data))
                 .ToArray();
+            connectionService.Timeouted
+                .Select(conn => conn.Player)
+                .ToList()
+                .ForEach(p => gameLoopManager.playerService.Kill(p));
             connectionService.RemoveTimeouted();
             return tasks;
         }

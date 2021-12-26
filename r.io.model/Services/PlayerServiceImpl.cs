@@ -65,6 +65,12 @@ namespace r.io.model.Services
             return game.gameArea.parts.Find(i => (x >= i.xLeft && x < i.xLeft + sideRange) && (y >= i.yTop && y < i.yTop + sideRange));
         }
 
+        public void Kill(CircleGameObject player)
+        {
+            getParts().Find(i => i.killableObjects.Contains(player)).killableObjects.Remove(player);
+            player.isAlive = false;
+        }
+
         private (double, double) GetNewPlayerCoords(PlayerCircle player, double x, double y)
         {
             double normalizedX = Normalize(x, y);
@@ -93,8 +99,7 @@ namespace r.io.model.Services
         private void Eat(CircleGameObject killer, CircleGameObject food)
         {
             killer.radius += Math.Sqrt(food.radius) / 3;
-            getParts().Find(i => i.killableObjects.Contains(food)).killableObjects.Remove(food);
-            food.isAlive = false;
+            Kill(food);
         }
 
         private List<AreaPart> getParts()
