@@ -41,7 +41,7 @@ namespace r.io.server.PackageProcessing
                 var areas = gameLoopManager.playerService.getGameAreasAround(conn.Player.x, conn.Player.y);
                 pack.Node = new NearbyAreasNode()
                 {
-                    Foodes = areas.SelectMany(a => a.killableObjects).Where(k => k is FoodCircle).Select(f => f.ToNode()).ToList(),
+                    Food = areas.SelectMany(a => a.killableObjects).Where(k => k is FoodCircle).Select(f => f.ToNode()).ToList(),
                     Players = new(areas.SelectMany(a => a.killableObjects)
                         .Where(k => k is PlayerCircle)
                         .Cast<PlayerCircle>()

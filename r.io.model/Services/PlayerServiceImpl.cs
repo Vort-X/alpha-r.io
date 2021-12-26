@@ -18,9 +18,13 @@ namespace r.io.model.Services
 
         public void Move(PlayerCircle player, double x, double y)
         {
+            if (x == 0 && y == 0) return;
+            
+            var nX = x / Math.Sqrt(x * x + y * y);
+            var nY = y / Math.Sqrt(x * x + y * y);
             AreaPart partBeforeMove = getAreaPart(player.x, player.y);
-            double newX = player.x + x * player.velocity / player.radius;
-            double newY = player.y + y * player.velocity / player.radius;
+            double newX = player.x + nX * player.velocity / player.radius;
+            double newY = player.y + nY * player.velocity / player.radius;
             player.x = newX;
             player.y = newY;
             AreaPart newAreaPart = getAreaPart(player.x, player.y);
@@ -69,7 +73,7 @@ namespace r.io.model.Services
 
         private void Eat(CircleGameObject killer, CircleGameObject food)
         {
-            killer.radius += food.radius;
+            killer.radius += Math.Sqrt(food.radius) / 3;
             getParts().Find(i => i.killableObjects.Contains(food)).killableObjects.Remove(food);
         }
 

@@ -18,11 +18,15 @@ namespace R.io.client.Network
 		private UdpClient Client { get; set; }
 		private Serializer<UdpPackage> _serializer;
 
-		private event Action<NearbyAreasNode> OnNearby;
+		private Vector2 _inputMovement = Vector2.Zero;
+
+		public event Action<NearbyAreasNode> OnNearby;
+		public event Action<TopPlayersNode> OnTopPlayers;
+		public event Action OnPlayerDeath;
 
 		public override void _Ready()
 		{
-			Client = new UdpClient(LocalPort);
+			Client = new UdpClient();
 			_serializer = new Serializer<UdpPackage>();
 		}
 
@@ -39,19 +43,37 @@ namespace R.io.client.Network
 					case NearbyAreasNode nearby:
 						OnNearby?.Invoke(nearby);
 						break;
+					case TopPlayersNode topPlayers:
+						OnTopPlayers?.Invoke(topPlayers);
+						break;
+					case PlayerDeathNode _:
+						OnPlayerDeath?.Invoke();
+						break;
 				}
+
+				var move = new UdpPackage()
+				{
+					Type = 'm',
+					Node = new MoveNode()
+					{
+						X = _inputMovement.x,
+						Y = _inputMovement.y,
+					}
+				};
 				
-				GD.Print(package.Type);
+				Send(move);
 			}
 		}
 
 		public void Send(UdpPackage package)
 		{
 			var data = _serializer.Serialize(package);
-			GD.Print($"{Host}/{HostPort} username: {(package.Node as UsernameNode).Username}");
 			Client.Send(data, data.Length, Host, HostPort);
 		}
-		
-		
+
+		public void SetMovementDirection(Vector2 movement)
+		{
+			_inputMovement = movement;
+		}
 	}
 }

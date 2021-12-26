@@ -6,6 +6,7 @@ namespace R.io.client.SceneManager
 	{
 		[Export] public PackedScene MenuScene { get; set; }
 		[Export] public PackedScene GameScene { get; set; }
+		[Export] public PackedScene ResultsScene { get; set; }
 
 		public void SwitchToGame()
 		{
@@ -15,6 +16,11 @@ namespace R.io.client.SceneManager
 		public void SwitchToMenu()
 		{
 			GetTree().ChangeScene(MenuScene.ResourcePath);
+		}
+
+		public void SwitchToResults()
+		{
+			GetTree().ChangeScene(ResultsScene.ResourcePath);
 		}
 	}
 }

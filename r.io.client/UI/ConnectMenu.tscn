@@ -5,7 +5,7 @@
 [ext_resource path="res://UI/ConnectionButton.cs" type="Script" id=3]
 
 [sub_resource type="DynamicFont" id=1]
-size = 72
+size = 70
 outline_size = 2
 outline_color = Color( 0.47451, 0.0901961, 0.0901961, 1 )
 font_data = ExtResource( 1 )
@@ -14,23 +14,23 @@ font_data = ExtResource( 1 )
 anchor_right = 1.0
 anchor_bottom = 1.0
 custom_constants/margin_right = 300
-custom_constants/margin_top = 120
+custom_constants/margin_top = 100
 custom_constants/margin_left = 300
-custom_constants/margin_bottom = 200
+custom_constants/margin_bottom = 150
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 margin_left = 300.0
-margin_top = 120.0
+margin_top = 100.0
 margin_right = 724.0
-margin_bottom = 400.0
+margin_bottom = 450.0
 size_flags_vertical = 3
 
 [node name="RichTextLabel" type="RichTextLabel" parent="VBoxContainer"]
 margin_right = 424.0
-margin_bottom = 90.0
+margin_bottom = 114.0
 input_pass_on_modal_close_click = false
 size_flags_horizontal = 5
 size_flags_vertical = 3
@@ -38,9 +38,9 @@ custom_fonts/normal_font = SubResource( 1 )
 text = "   ALPHA-R.IO"
 
 [node name="MarginContainer" type="MarginContainer" parent="VBoxContainer"]
-margin_top = 94.0
+margin_top = 118.0
 margin_right = 424.0
-margin_bottom = 185.0
+margin_bottom = 232.0
 size_flags_vertical = 3
 custom_constants/margin_right = 50
 custom_constants/margin_top = 30
@@ -51,13 +51,13 @@ custom_constants/margin_bottom = 30
 margin_left = 50.0
 margin_top = 30.0
 margin_right = 374.0
-margin_bottom = 61.0
+margin_bottom = 84.0
 script = ExtResource( 2 )
 
 [node name="MarginContainer2" type="MarginContainer" parent="VBoxContainer"]
-margin_top = 189.0
+margin_top = 236.0
 margin_right = 424.0
-margin_bottom = 280.0
+margin_bottom = 350.0
 size_flags_vertical = 3
 custom_constants/margin_top = 30
 custom_constants/margin_bottom = 30
@@ -65,7 +65,7 @@ custom_constants/margin_bottom = 30
 [node name="Button" type="Button" parent="VBoxContainer/MarginContainer2"]
 margin_top = 30.0
 margin_right = 424.0
-margin_bottom = 61.0
+margin_bottom = 84.0
 size_flags_vertical = 3
 text = "Connect"
 script = ExtResource( 3 )

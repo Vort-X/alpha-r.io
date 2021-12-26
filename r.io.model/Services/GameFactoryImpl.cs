@@ -13,8 +13,8 @@ namespace r.io.model.Services
             double roundDurationInSeconds = 100;
             int gameAreaSide = 1000;
             int areaPartSide = 100;
-            double foodRadius = 5;
-            int foodAmount = 40*100;
+            double foodRadius = 2;
+            int foodAmount = 40*10;
 
             Timer roundTimer = new Timer(100 * roundDurationInSeconds);
 
@@ -44,8 +44,8 @@ namespace r.io.model.Services
 
         public PlayerCircle createPlayer(Game game, string name)
         {
-            int minimalRadius = 10;
-            float velocity = 10;
+            int minimalRadius = 5;
+            float velocity = 2;
 
 
             double x = generateRandomCoords(game.gameArea.maxX);

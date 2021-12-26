@@ -6,11 +6,11 @@ using R.io.client.SceneManager;
 
 public class ConnectionButton : Button
 {
-	private MenuState _menu;
+	private PlayerState _player;
 	
 	public override void _Ready()
 	{
-		_menu = GetNode<MenuState>("/root/MenuState");
+		_player = GetNode<PlayerState>("/root/MenuState");
 	}
 	
 	private void _on_Button_pressed()
@@ -18,9 +18,9 @@ public class ConnectionButton : Button
 		var connectionService = new ConnectionService(GetNode<UdpClientNode>("/root/UdpClient"));
 		
 		connectionService.Connect(
-			string.IsNullOrEmpty(_menu.UserName) ? 
+			string.IsNullOrEmpty(_player.UserName) ? 
 				new Guid().ToString()[..8] 
-				: _menu.UserName);
+				: _player.UserName);
 		
 		GetNode<SceneManager>("/root/SceneManager").SwitchToGame();
 	}

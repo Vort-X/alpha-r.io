@@ -7,7 +7,6 @@ namespace r.io.shared.PackageProcessing
     {
         public abstract GameServiceCollection GameServices { set; }
         public abstract char Type { get; }
-
         public abstract void Handle(UdpReceiveResult result, UdpPackage pack);
     }
 }

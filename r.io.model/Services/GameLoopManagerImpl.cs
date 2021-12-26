@@ -27,7 +27,7 @@ namespace r.io.model.Services
         {
             //Method StartNewGame calls every Round.Duration + Round.PauseBeforeNext milliseconds
             //Delay before first execution - 3000 milliseconds
-            CoolerTimer t = new(StartNewGame, new object(), 3000, Round.Duration + Round.PauseBeforeNext);
+            CoolerTimer t = new(StartNewGame, new object(), 1000, Round.Duration + Round.PauseBeforeNext);
         }
 
         private void StartNewGame(object state)
@@ -39,6 +39,7 @@ namespace r.io.model.Services
             game.timerFromRoundStart.AutoReset = false;
             game.timerFromRoundStart.Elapsed += (s, e) => RoundEnded?.Invoke();
             game.timerFromRoundStart.Start();
+            Console.WriteLine("New Round Started");
         }
     }
 }

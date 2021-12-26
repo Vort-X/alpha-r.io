@@ -3,15 +3,15 @@ using R.io.client;
 
 public class UserNameTextEdit : TextEdit
 {
-	private MenuState _menu;
+	private PlayerState _player;
 
 	public override void _Ready()
 	{
-		_menu = GetNode<MenuState>("/root/MenuState");
+		_player = GetNode<PlayerState>("/root/MenuState");
 	}
 	
 	private void _on_TextEdit_text_changed()
 	{
-		_menu.UserName = Text;
+		_player.UserName = Text;
 	}
 }

@@ -10,7 +10,7 @@ namespace r.io.server.Constants
     static class Server
     {
         public static readonly int Port = 4096;
-        public static readonly int TicksPerSecond = 10;
+        public static readonly int TicksPerSecond = 60;
         public static readonly int SessionTimeout = 5 * 1000;
     }
 }
